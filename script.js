@@ -13,6 +13,8 @@ const messages = [
   }
 ];
 
+const workerUrl = 'https://lingering-dream-1922.javierbradlim321.workers.dev/';
+
 chatForm.addEventListener('submit', async (event) => {
   event.preventDefault();
 
@@ -28,11 +30,10 @@ chatForm.addEventListener('submit', async (event) => {
 
   try {
     // Send a POST request to the OpenAI API
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch(workerUrl, {
       method: 'POST', // We are POST-ing data to the API
       headers: {
         'Content-Type': 'application/json', // Set the content type to JSON
-        'Authorization': `Bearer ${apiKey}` // Include the API key for authorization
       },
       // Send model details and system message
       body: JSON.stringify({
