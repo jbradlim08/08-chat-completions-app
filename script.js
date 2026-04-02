@@ -8,7 +8,8 @@ const messages = [
     role: 'system',
     content: `You are a friendly Budget Travel Planner, specializing in cost-conscious travel advice. You help users find cheap flights, budget-friendly accommodations, affordable itineraries, and low-cost activities in their chosen destination.
 
-    If a user's query is unrelated to budget travel, respond by stating that you do not know.`
+    If a user's query is unrelated to budget travel, respond by stating that you do not know.
+    However don't forget their name, normal conversation is fine.`
   }
 ];
 
@@ -23,7 +24,7 @@ chatForm.addEventListener('submit', async (event) => {
   messages.push({ role: 'user', content: prompt });
   console.log('Messages count after user push:', messages.length);
 
-  responseContainer.textContent = 'Thinking...';
+  responseContainer.textContent = 'Processing...';
 
   try {
     // Send a POST request to the OpenAI API
@@ -36,20 +37,28 @@ chatForm.addEventListener('submit', async (event) => {
       // Send model details and system message
       body: JSON.stringify({
         model: 'gpt-4o',
-        messages
+        messages,
+        max_completion_tokens: 800,
+        temperature: 0.7,
+        frequency_penalty: 0.5
+
       })
     });
+
+    if(!response.ok){
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
     // Parse and render response data on the page
     const result = await response.json();
     const content = result?.choices?.[0]?.message?.content || 'No response received.';
-    console.log('Assistant response:', content);
+
     messages.push({ role: 'assistant', content });
-    console.log('Messages count after assistant push:', messages.length);
     responseContainer.textContent = content;
   } catch (error) {
     // Remove the last user message if request fails so history stays consistent.
     messages.pop();
+    console.error(`Error: ${error}`);
     responseContainer.textContent = 'Something went wrong. Please try again.';
   }
 });
